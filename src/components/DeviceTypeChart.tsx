@@ -1,12 +1,28 @@
 import styled from "@emotion/styled";
 import { ResponsivePie } from "@nivo/pie";
 
-export const DeviceTypeChart = () => {
-    const data = [
-        { id: "Android", label: "Android", value: 240, color: "#f04c3e" },
-        { id: "Windows", label: "Windows", value: 240, color: "#9bd1ff" },
-        { id: "iOS", label: "iOS", value: 240, color: "#f0c23e" },
-    ];
+interface DeviceTypeChartProps {
+    devices: {
+        [key: string]: {
+            count: number;
+            percentage: number;
+        };
+    };
+}
+
+const deviceColors: { [key: string]: string } = {
+    Android: "#f04c3e",
+    Windows: "#9bd1ff",
+    iOS: "#f0c23e",
+};
+
+export const DeviceTypeChart = ({ devices }: DeviceTypeChartProps) => {
+    const data = Object.entries(devices).map(([key, value]) => ({
+        id: key,
+        label: key,
+        value: value.count,
+        color: deviceColors[key] || "#cccccc",
+    }));
 
     return (
         <Container>
@@ -30,7 +46,7 @@ export const DeviceTypeChart = () => {
                         <LegendItem key={item.id}>
                             <LegendColor style={{ backgroundColor: item.color }} />
                             <LegendText>
-                                <strong>{item.label}</strong> {item.value}명 (80%)
+                                <strong>{item.label}</strong> {item.value}명 ({devices[item.id].percentage}%)
                             </LegendText>
                         </LegendItem>
                     ))}
@@ -43,11 +59,11 @@ export const DeviceTypeChart = () => {
 const Container = styled.div`
     display: flex;
     flex-direction: column;
-    width: 100%;
-    max-width: 700px;
+    width: 476px;
+    height: 200px;
     border: 1px solid #e5e5e5;
     border-radius: 12px;
-    padding: 16px 24px;
+    padding: 12px 16px;
     background-color: #fff;
 `;
 
@@ -65,7 +81,7 @@ const Content = styled.div`
 
 const ChartWrapper = styled.div`
   flex: 1;
-  height: 220px;
+  height: 150px;
 `;
 
 const LegendWrapper = styled.div`

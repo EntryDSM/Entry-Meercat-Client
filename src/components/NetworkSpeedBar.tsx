@@ -30,10 +30,10 @@ const Container = styled.div`
   flex-direction: column;
   border: 1px solid #e5e5e5;
   border-radius: 12px;
-  padding: 16px 24px;
+  padding: 12px 16px;
   background-color: #fff;
-  width: 100%;
-  max-width: 700px;
+  width: 476px;
+  height: 90px;
 `;
 
 const Label = styled.div`
@@ -48,7 +48,7 @@ const BarWrapper = styled.div`
 
 const Bar = styled.div`
   display: flex;
-  height: 40px;
+  height: 32px;
   border-radius: 50px;
   overflow: hidden;
 `;

@@ -4,7 +4,7 @@ import type { Property } from 'csstype';
 interface ITextType {
   children?: React.ReactNode;
   color?: string;
-  fontSize?: number;
+  fontSize?: number | string;
   fontWeight?: number;
   position?: Property.Position;
   onClick?: (event: React.MouseEvent<HTMLDivElement>) => void;
@@ -52,12 +52,12 @@ export const Text = ({
   }, [isMedia]);
 
   // isMedia가 true면 화면 크기 따라 fontSize 조절, 아니면 그냥 fontSize 사용
-  const adjustedFontSize = isMedia && isMobile ? fontSize * 0.75 : fontSize;
+  const adjustedFontSize = isMedia && isMobile && typeof fontSize === 'number' ? fontSize * 0.75 : fontSize;
 
   const style: React.CSSProperties = {
     width,
     color,
-    fontSize: adjustedFontSize,
+    fontSize: typeof adjustedFontSize === 'number' ? `${adjustedFontSize}px` : adjustedFontSize,
     fontWeight,
     position,
     top,
