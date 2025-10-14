@@ -1,5 +1,5 @@
 import styled from "@emotion/styled"
-import { Content } from "../components"
+import { Content, DeviceTypeChart } from "../components"
 import { Flex, Text } from "../design-token"
 
 export const Monitoring = () => {
@@ -51,7 +51,8 @@ export const Monitoring = () => {
           <Content width="409" backColor="#ffffff" textColor="#000000" title="최근 1시간 클라이언트 오류">0건</Content>
           <Content width="409" backColor="#ffffff" textColor="#000000" title="최근 1시간 클라이언트 경고">0건</Content>
         </ColumnContainer>
-        <div>접근 기기 종류</div>
+        {/*<div>접근 기기 종류</div>*/}
+          <DeviceTypeChart/>
         <Content textColor="#000000" backColor="#F7F7F7"  width={'195'} title="서버 API 정상">160명</Content>
         <Content width={'195'} title="서버 API 오류">160명</Content>
         <Content width={'409'} title="총 API 요청">160명</Content>
