@@ -137,13 +137,55 @@ export const Monitoring = () => {
         </Content>
         <FlexContainer>
           <FlexContent title="종합">{data.realtime.concurrent.total}명</FlexContent>
-          <FlexContent title="인증" textColor="#000000" backColor="#F7F7F7">
+          <FlexContent
+            title="인증"
+            backColor={
+              data.realtime.concurrent.byPageType.AUTH >= data.realtime.concurrent.byPageType.ADMISSION &&
+              data.realtime.concurrent.byPageType.AUTH >= data.realtime.concurrent.byPageType.USER
+                ? "#FF3737"
+                : "#F7F7F7"
+            }
+            textColor={
+              data.realtime.concurrent.byPageType.AUTH >= data.realtime.concurrent.byPageType.ADMISSION &&
+              data.realtime.concurrent.byPageType.AUTH >= data.realtime.concurrent.byPageType.USER
+                ? "#ffffff"
+                : "#000000"
+            }
+          >
             {data.realtime.concurrent.byPageType.AUTH}명
           </FlexContent>
-          <FlexContent title="접수" backColor="#FF3737">
+          <FlexContent
+            title="접수"
+            backColor={
+              data.realtime.concurrent.byPageType.ADMISSION >= data.realtime.concurrent.byPageType.AUTH &&
+              data.realtime.concurrent.byPageType.ADMISSION >= data.realtime.concurrent.byPageType.USER
+                ? "#FF3737"
+                : "#F7F7F7"
+            }
+            textColor={
+              data.realtime.concurrent.byPageType.ADMISSION >= data.realtime.concurrent.byPageType.AUTH &&
+              data.realtime.concurrent.byPageType.ADMISSION >= data.realtime.concurrent.byPageType.USER
+                ? "#ffffff"
+                : "#000000"
+            }
+          >
             {data.realtime.concurrent.byPageType.ADMISSION}명
           </FlexContent>
-          <FlexContent title="유저" textColor="#000000" backColor="#F7F7F7">
+          <FlexContent
+            title="유저"
+            backColor={
+              data.realtime.concurrent.byPageType.USER >= data.realtime.concurrent.byPageType.ADMISSION &&
+              data.realtime.concurrent.byPageType.USER >= data.realtime.concurrent.byPageType.AUTH
+                ? "#FF3737"
+                : "#F7F7F7"
+            }
+            textColor={
+              data.realtime.concurrent.byPageType.USER >= data.realtime.concurrent.byPageType.ADMISSION &&
+              data.realtime.concurrent.byPageType.USER >= data.realtime.concurrent.byPageType.AUTH
+                ? "#ffffff"
+                : "#000000"
+            }
+          >
             {data.realtime.concurrent.byPageType.USER}명
           </FlexContent>
         </FlexContainer>
