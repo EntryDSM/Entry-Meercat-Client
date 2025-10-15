@@ -101,14 +101,7 @@ export const Monitoring = () => {
           >
             {data.errors.lastHour.client}건
           </Content>
-          <Content
-            width="204"
-            backColor="#ffffff"
-            textColor="#000000"
-            title="최근 1시간 클라이언트 경고"
-          >
-            {data.errors.lastHour.clientWarnings}건
-          </Content>
+
         </ColumnContainer>
 
         <Content width={"228"} title="평균 서버 응답시간">{data.performance.server.avgResponseTime}ms</Content>
