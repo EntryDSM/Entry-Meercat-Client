@@ -84,10 +84,10 @@ export const Monitoring = () => {
           >
             <Flex alignItems="end" gap={4}>
               <Text fontSize={15} fontWeight={600}>
-                Max
+                최대
               </Text>
               {data.timeline.concurrentMax}
-              <Text>Avg</Text>
+              <Text>평균</Text>
               {data.timeline.concurrentAvg}
             </Flex>
           </Content>
