@@ -1,6 +1,11 @@
 import styled from "@emotion/styled";
 import { keyframes, css } from "@emotion/react";
-import { Content, DeviceTypeChart, NetworkSpeedBar } from "../components";
+import {
+  ConcurrentUsersCount,
+  Content,
+  DeviceTypeChart,
+  NetworkSpeedBar,
+} from "../components";
 import { Flex, Text } from "../design-token";
 import { useEffect, useState, useRef } from "react";
 import { fetchDashboardData } from "../apis/dashboard";
@@ -12,47 +17,41 @@ export const Monitoring = () => {
 
   useEffect(() => {
     const loadData = async () => {
-      if (isLoadingRef.current) return; // 이전 요청이 진행 중이면 중단
+      if (isLoadingRef.current) return;
 
       isLoadingRef.current = true;
       try {
         const response = await fetchDashboardData();
         setData(response.data);
       } catch (error) {
-        console.error('Failed to fetch dashboard data:', error);
+        console.error("Failed to fetch dashboard data:", error);
       } finally {
         isLoadingRef.current = false;
       }
     };
 
-    loadData(); // 초기 로드
-    const interval = setInterval(loadData, 2000); // 2초마다 업데이트
+    loadData();
+    const interval = setInterval(loadData, 2000);
 
     return () => clearInterval(interval);
   }, []);
 
   if (!data) {
-    return <div>Loading...</div>;
+    return <LoadingContainer>Loading...</LoadingContainer>;
   }
 
   return (
-    <Flex
-      gap={20}
-      isColumn
-      paddingLeft="60px"
-      paddingRight="60px"
-      paddingBottom="60px"
-      paddingTop="60px"
-    >
-      <Flex isColumn gap={4}>
+    <ResponsiveContainer>
+      <HeaderSection>
         <Text fontSize={22} color={"#5F5F5F"}>
           EntryDSM Client Monitoring
         </Text>
         <Text fontSize={32} fontWeight={700} color="#000000">
           라이브 서버
         </Text>
-      </Flex>
-      <Flex gap={20} flexWrap="wrap">
+      </HeaderSection>
+
+      <GridContainer>
         <CommitContainer>
           <Content
             width="204"
@@ -69,7 +68,6 @@ export const Monitoring = () => {
           </Flex>
         </CommitContainer>
 
-        {/*<div>접근 기기 종류</div>*/}
         <DeviceTypeChart devices={data.devices} />
 
         <SideContainer>
@@ -91,6 +89,7 @@ export const Monitoring = () => {
               {data.timeline.concurrentAvg}
             </Flex>
           </Content>
+          <ConcurrentUsersCount timeline={data.timeline} />
         </SideContainer>
 
         <ColumnContainer>
@@ -102,10 +101,11 @@ export const Monitoring = () => {
           >
             {data.errors.lastHour.client}건
           </Content>
-
         </ColumnContainer>
 
-        <Content width={"228"} title="평균 서버 응답시간">{data.performance.server.avgResponseTime}ms</Content>
+        <Content width={"228"} title="평균 서버 응답시간">
+          {data.performance.server.avgResponseTime}ms
+        </Content>
         <Content
           width={"228"}
           title="최대 서버 응답시간"
@@ -124,13 +124,14 @@ export const Monitoring = () => {
             <Text fontSize={15} fontWeight={600}>
               최근 1시간
             </Text>
-            {data.serverTimeout.lastHour}회
-            <Text>전체</Text>
+            {data.serverTimeout.lastHour}회<Text>전체</Text>
             {data.serverTimeout.total}회
           </Flex>
         </Content>
         <FlexContainer>
-          <FlexContent title="종합">{data.realtime.concurrent.total}명</FlexContent>
+          <FlexContent title="종합">
+            {data.realtime.concurrent.total}명
+          </FlexContent>
           <FlexContent
             title="인증"
             backColor={
@@ -212,8 +213,12 @@ export const Monitoring = () => {
           {data.apiStatus.totalRequests}건
         </Content>
 
-        {/*<div>네트워크 속도</div>*/}
-        <NetworkSpeedBar goodPercent={data.network.good / (data.network.good + data.network.poor) * 100 || 0} />
+        <NetworkSpeedBar
+          goodPercent={
+            (data.network.good / (data.network.good + data.network.poor)) *
+              100 || 0
+          }
+        />
 
         <Content width={"352"} title="클라이언트 크리티컬 오류">
           {data.errors.lastHour.critical}건
@@ -253,10 +258,69 @@ export const Monitoring = () => {
         >
           {data.pdf.download.failed}명
         </Content>
-      </Flex>
-    </Flex>
+      </GridContainer>
+    </ResponsiveContainer>
   );
 };
+
+const LoadingContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  font-size: 18px;
+  color: #5f5f5f;
+`;
+
+const ResponsiveContainer = styled.div`
+  padding: 60px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+
+  @media (max-width: 1200px) {
+    padding: 40px;
+  }
+
+  @media (max-width: 768px) {
+    padding: 20px;
+  }
+
+  @media (max-width: 480px) {
+    padding: 16px;
+  }
+`;
+
+const HeaderSection = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+
+  @media (max-width: 768px) {
+    h1 {
+      font-size: 24px !important;
+    }
+
+    p {
+      font-size: 16px !important;
+    }
+  }
+`;
+
+const GridContainer = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  width: 100%;
+
+  @media (max-width: 768px) {
+    gap: 16px;
+  }
+
+  > * {
+    flex: 0 0 auto;
+  }
+`;
 
 const CommitContainer = styled.div`
   padding: 12px;
@@ -265,8 +329,13 @@ const CommitContainer = styled.div`
   display: flex;
   gap: 8px;
   width: 228px;
-  height: 200px;
+  min-height: 200px;
   flex-direction: column;
+
+  @media (max-width: 768px) {
+    width: 100%;
+    min-height: auto;
+  }
 `;
 
 const ColumnContainer = styled.div`
@@ -276,8 +345,13 @@ const ColumnContainer = styled.div`
   display: flex;
   gap: 8px;
   width: 228px;
-  height: 200px;
+  min-height: 200px;
   flex-direction: column;
+
+  @media (max-width: 768px) {
+    width: 100%;
+    min-height: auto;
+  }
 `;
 
 const FlexContainer = styled.div`
@@ -288,15 +362,25 @@ const FlexContainer = styled.div`
   justify-content: center;
   align-items: center;
   gap: 8px;
-  width: 476px;
-  height: 90px;
+  min-height: 90px;
+  grid-column: span 2;
+
+  @media (max-width: 768px) {
+    grid-column: span 1;
+    flex-wrap: wrap;
+  }
 `;
 
 const SideContainer = styled.div`
   display: flex;
   flex-direction: column;
   gap: 20px;
-  height: 200px;
+  min-height: 200px;
+
+  @media (max-width: 768px) {
+    min-height: auto;
+    gap: 16px;
+  }
 `;
 
 const CommitContent = styled.div`
@@ -316,8 +400,14 @@ const blink = keyframes`
   }
 `;
 
-const FlexContent = styled.div<{backColor?: string, textColor?: string, title: string, isBlinking?: boolean}>`
+const FlexContent = styled.div<{
+  backColor?: string;
+  textColor?: string;
+  title: string;
+  isBlinking?: boolean;
+}>`
   flex: 1;
+  min-width: 80px;
   height: 66px;
   padding: clamp(6px, 0.8vh, 8px) clamp(4px, 0.5vw, 6px);
   border-radius: 8px;
@@ -326,8 +416,8 @@ const FlexContent = styled.div<{backColor?: string, textColor?: string, title: s
   justify-content: center;
   align-items: center;
   gap: clamp(2px, 0.3vh, 4px);
-  background-color: ${({backColor}) => backColor || "#FF7E36"};
-  color: ${({textColor}) => textColor || "#ffffff"};
+  background-color: ${({ backColor }) => backColor || "#FF7E36"};
+  color: ${({ textColor }) => textColor || "#ffffff"};
   font-size: clamp(10px, 1vw, 12px);
   animation: ${({ isBlinking }) =>
     isBlinking &&
@@ -335,13 +425,16 @@ const FlexContent = styled.div<{backColor?: string, textColor?: string, title: s
       ${blink} 1s infinite
     `};
 
-
   &::before {
-    content: "${({title}) => title}";
+    content: "${({ title }) => title}";
     font-weight: 300;
     font-size: clamp(9px, 0.9vw, 11px);
   }
 
   font-size: clamp(16px, 1.8vw, 20px);
   font-weight: 600;
+
+  @media (max-width: 768px) {
+    min-width: calc(50% - 4px);
+  }
 `;
