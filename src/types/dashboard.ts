@@ -107,5 +107,6 @@ export interface DashboardData {
     revisitSessions: number;
     revisitRate: number;
     avgRevisitCount: number;
+    avgStayTime: string;
   };
 }

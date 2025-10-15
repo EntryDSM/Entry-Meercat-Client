@@ -190,7 +190,7 @@ export const Monitoring = () => {
           {data.visitorStats.totalSessions}명
         </Content>
         <Content width="476" title="사용자 평균 체류시간">
-          {data.submissions.avgDuration}
+          {data.visitorStats.avgStayTime}
         </Content>
         <Content width="228" title="클라이언트 DOM 시간">
           {data.performance.client.avgDomLoadTime ?? 0}ms
