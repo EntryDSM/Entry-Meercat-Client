@@ -52,6 +52,67 @@ export const Monitoring = () => {
       </HeaderSection>
 
       <GridContainer>
+        <Flex gap={12}>
+        <Content width={"228"} title="평균 서버 응답시간">
+          {data.performance.server.avgResponseTime}ms
+        </Content>
+        <Content
+          width={"228"}
+          title="최대 서버 응답시간"
+          textColor="#000000"
+          backColor="#F7F7F7"
+        >
+          {data.performance.server.maxResponseTime}ms
+        </Content>
+
+        <Content
+          textColor="#000000"
+          backColor="#F7F7F7"
+          width={"228"}
+          title="서버 API 정상"
+        >
+          {data.apiStatus.successRequests}건
+        </Content>
+
+        <Content width={"228"} title="서버 API 오류">
+          {data.apiStatus.errorRequests}건
+        </Content>
+
+        <Content width={"476"} title="총 API 요청">
+          {data.apiStatus.totalRequests}건
+        </Content>
+        </Flex>
+        <Flex gap={12}>
+
+        <Content
+          width="228"
+          textColor="#000000"
+          backColor="#F7F7F7"
+          title="총 접속자"
+        >
+          {data.visitorStats.totalSessions}명
+        </Content>
+        <Content width="476" title="사용자 평균 체류시간">
+          {data.visitorStats.avgStayTime}
+        </Content>
+        <Content width="228" title="클라이언트 DOM 시간">
+          {data.performance.client.avgDomLoadTime ?? 0}ms
+        </Content>
+
+
+        <NetworkSpeedBar
+          goodPercent={
+            (data.network.good / (data.network.good + data.network.poor)) *
+              100 || 0
+          }
+        />
+
+        <Content width={"352"} title="클라이언트 크리티컬 오류">
+          {data.errors.lastHour.critical}건
+        </Content>
+        </Flex>
+
+        <Flex gap={12}>
         <CommitContainer>
           <Content
             width="204"
@@ -89,9 +150,11 @@ export const Monitoring = () => {
               {data.timeline.concurrentAvg}
             </Flex>
           </Content>
-          <ConcurrentUsersCount timeline={data.timeline} />
         </SideContainer>
+        <ConcurrentUsersCount timeline={data.timeline} />
+        </Flex>
 
+        <Flex gap={12}>
         <ColumnContainer>
           <Content
             width="204"
@@ -103,31 +166,8 @@ export const Monitoring = () => {
           </Content>
         </ColumnContainer>
 
-        <Content width={"228"} title="평균 서버 응답시간">
-          {data.performance.server.avgResponseTime}ms
-        </Content>
-        <Content
-          width={"228"}
-          title="최대 서버 응답시간"
-          textColor="#000000"
-          backColor="#F7F7F7"
-        >
-          {data.performance.server.maxResponseTime}ms
-        </Content>
-        <Content
-          width={"476"}
-          textColor="#000000"
-          backColor="#F7F7F7"
-          title="서버 응답 타임아웃"
-        >
-          <Flex alignItems="end" gap={8}>
-            <Text fontSize={15} fontWeight={600}>
-              최근 1시간
-            </Text>
-            {data.serverTimeout.lastHour}회<Text>전체</Text>
-            {data.serverTimeout.total}회
-          </Flex>
-        </Content>
+        <Flex isColumn gap={2}>
+
         <FlexContainer>
           <FlexContent title="종합">
             {data.realtime.concurrent.total}명
@@ -182,47 +222,20 @@ export const Monitoring = () => {
           </FlexContent>
         </FlexContainer>
         <Content
-          width="228"
+          width={"476"}
           textColor="#000000"
           backColor="#F7F7F7"
-          title="총 접속자"
+          title="서버 응답 타임아웃"
         >
-          {data.visitorStats.totalSessions}명
+          <Flex alignItems="end" gap={8}>
+            <Text fontSize={15} fontWeight={600}>
+              최근 1시간
+            </Text>
+            {data.serverTimeout.lastHour}회<Text>전체</Text>
+            {data.serverTimeout.total}회
+          </Flex>
         </Content>
-        <Content width="476" title="사용자 평균 체류시간">
-          {data.visitorStats.avgStayTime}
-        </Content>
-        <Content width="228" title="클라이언트 DOM 시간">
-          {data.performance.client.avgDomLoadTime ?? 0}ms
-        </Content>
-
-        <Content
-          textColor="#000000"
-          backColor="#F7F7F7"
-          width={"228"}
-          title="서버 API 정상"
-        >
-          {data.apiStatus.successRequests}건
-        </Content>
-
-        <Content width={"228"} title="서버 API 오류">
-          {data.apiStatus.errorRequests}건
-        </Content>
-
-        <Content width={"476"} title="총 API 요청">
-          {data.apiStatus.totalRequests}건
-        </Content>
-
-        <NetworkSpeedBar
-          goodPercent={
-            (data.network.good / (data.network.good + data.network.poor)) *
-              100 || 0
-          }
-        />
-
-        <Content width={"352"} title="클라이언트 크리티컬 오류">
-          {data.errors.lastHour.critical}건
-        </Content>
+        </Flex>
         <Content
           textColor="#000000"
           backColor="#F7F7F7"
@@ -258,6 +271,9 @@ export const Monitoring = () => {
         >
           {data.pdf.download.failed}명
         </Content>
+        </Flex>
+
+
       </GridContainer>
     </ResponsiveContainer>
   );
@@ -309,7 +325,8 @@ const HeaderSection = styled.div`
 
 const GridContainer = styled.div`
   display: flex;
-  flex-wrap: wrap;
+  flex-direction: column;
+  /* flex-wrap: wrap; */
   gap: 20px;
   width: 100%;
 
