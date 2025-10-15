@@ -1,4 +1,5 @@
 import styled from "@emotion/styled";
+import { keyframes, css } from "@emotion/react";
 import { Content, DeviceTypeChart, NetworkSpeedBar } from "../components";
 import { Flex, Text } from "../design-token";
 import { useEffect, useState, useRef } from "react";
@@ -133,51 +134,48 @@ export const Monitoring = () => {
           <FlexContent
             title="인증"
             backColor={
-              data.realtime.concurrent.byPageType.AUTH >= data.realtime.concurrent.byPageType.ADMISSION &&
-              data.realtime.concurrent.byPageType.AUTH >= data.realtime.concurrent.byPageType.USER
+              data.realtime.concurrent.byPageType.AUTH > 0
                 ? "#FF3737"
                 : "#F7F7F7"
             }
             textColor={
-              data.realtime.concurrent.byPageType.AUTH >= data.realtime.concurrent.byPageType.ADMISSION &&
-              data.realtime.concurrent.byPageType.AUTH >= data.realtime.concurrent.byPageType.USER
+              data.realtime.concurrent.byPageType.AUTH > 0
                 ? "#ffffff"
                 : "#000000"
             }
+            isBlinking={data.realtime.concurrent.byPageType.AUTH > 0}
           >
             {data.realtime.concurrent.byPageType.AUTH}명
           </FlexContent>
           <FlexContent
             title="접수"
             backColor={
-              data.realtime.concurrent.byPageType.ADMISSION >= data.realtime.concurrent.byPageType.AUTH &&
-              data.realtime.concurrent.byPageType.ADMISSION >= data.realtime.concurrent.byPageType.USER
+              data.realtime.concurrent.byPageType.ADMISSION > 0
                 ? "#FF3737"
                 : "#F7F7F7"
             }
             textColor={
-              data.realtime.concurrent.byPageType.ADMISSION >= data.realtime.concurrent.byPageType.AUTH &&
-              data.realtime.concurrent.byPageType.ADMISSION >= data.realtime.concurrent.byPageType.USER
+              data.realtime.concurrent.byPageType.ADMISSION > 0
                 ? "#ffffff"
                 : "#000000"
             }
+            isBlinking={data.realtime.concurrent.byPageType.ADMISSION > 0}
           >
             {data.realtime.concurrent.byPageType.ADMISSION}명
           </FlexContent>
           <FlexContent
             title="유저"
             backColor={
-              data.realtime.concurrent.byPageType.USER >= data.realtime.concurrent.byPageType.ADMISSION &&
-              data.realtime.concurrent.byPageType.USER >= data.realtime.concurrent.byPageType.AUTH
+              data.realtime.concurrent.byPageType.USER > 0
                 ? "#FF3737"
                 : "#F7F7F7"
             }
             textColor={
-              data.realtime.concurrent.byPageType.USER >= data.realtime.concurrent.byPageType.ADMISSION &&
-              data.realtime.concurrent.byPageType.USER >= data.realtime.concurrent.byPageType.AUTH
+              data.realtime.concurrent.byPageType.USER > 0
                 ? "#ffffff"
                 : "#000000"
             }
+            isBlinking={data.realtime.concurrent.byPageType.USER > 0}
           >
             {data.realtime.concurrent.byPageType.USER}명
           </FlexContent>
@@ -312,7 +310,13 @@ const CommitContent = styled.div`
   padding: clamp(4px, 0.5vh, 6px) clamp(8px, 0.8vw, 10px);
 `;
 
-const FlexContent = styled.div<{backColor?: string, textColor?: string, title: string}>`
+const blink = keyframes`
+  50% {
+    opacity: 0.2;
+  }
+`;
+
+const FlexContent = styled.div<{backColor?: string, textColor?: string, title: string, isBlinking?: boolean}>`
   flex: 1;
   height: 66px;
   padding: clamp(6px, 0.8vh, 8px) clamp(4px, 0.5vw, 6px);
@@ -325,6 +329,12 @@ const FlexContent = styled.div<{backColor?: string, textColor?: string, title: s
   background-color: ${({backColor}) => backColor || "#FF7E36"};
   color: ${({textColor}) => textColor || "#ffffff"};
   font-size: clamp(10px, 1vw, 12px);
+  animation: ${({ isBlinking }) =>
+    isBlinking &&
+    css`
+      ${blink} 1s infinite
+    `};
+
 
   &::before {
     content: "${({title}) => title}";
