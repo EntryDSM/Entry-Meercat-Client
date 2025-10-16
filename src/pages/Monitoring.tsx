@@ -53,16 +53,23 @@ export const Monitoring = () => {
 
       <GridContainer>
         <Flex gap={12}>
-        <Content width={"228"} title="평균 서버 응답시간">
-          {data.performance.server.avgResponseTime}ms
+        <Content width={"228"} title="실시간 사이트 접속자">
+          {data.realtime.concurrent.total}명
         </Content>
         <Content
           width={"228"}
-          title="최대 서버 응답시간"
+          title="접속자 통계"
           textColor="#000000"
           backColor="#F7F7F7"
         >
-          {data.performance.server.maxResponseTime}ms
+            <Flex alignItems="end" gap={4}>
+                <Text fontSize={15} fontWeight={600}>
+                    최대
+                </Text>
+                {data.timeline.concurrentMax}
+                <Text>평균</Text>
+                {data.timeline.concurrentAvg}
+            </Flex>
         </Content>
 
         <Content
@@ -74,7 +81,13 @@ export const Monitoring = () => {
           {data.apiStatus.successRequests}건
         </Content>
 
-        <Content width={"228"} textColor="#000000" backColor="#F7F7F7" title="최근 서버 API 에러">
+        <Content
+          width={"228"}
+          textColor={data.errors.lastHour.server >= 1 ? "red" : "#000000"}
+          backColor="#F7F7F7"
+          title="최근 서버 API 에러"
+          className={data.errors.lastHour.server >= 1 ? "blink" : ""}
+        >
             {data.errors.lastHour.server}건
         </Content>
 
@@ -95,12 +108,16 @@ export const Monitoring = () => {
         <Content width="476" title="사용자 평균 체류시간">
           {data.visitorStats.avgStayTime}
         </Content>
-        <Content width="228"  textColor="#000000" backColor="#F7F7F7" title="클라이언트 로드 시간">
-          {data.performance.client.avgDomLoadTime ?? 0}ms
-        </Content>
+            <Content
+                width="228"
+                textColor="#000000"
+                backColor="#F7F7F7"
+                title="클라이언트 로드 시간"
+            >
+                {((data.performance.client.avgDomLoadTime ?? 0) / 1000).toFixed(2)}초
+            </Content>
 
-
-        <NetworkSpeedBar
+            <NetworkSpeedBar
           goodPercent={
             (data.network.good / (data.network.good + data.network.poor)) *
               100 || 0
@@ -117,8 +134,9 @@ export const Monitoring = () => {
           <Content
             width="204"
             backColor="#ffffff"
-            textColor="#000000"
+            textColor={data.errors.lastHour.server >= 1 ? "red" : "#000000"}
             title="최근 1시간 서버 요청 오류"
+            className={data.errors.lastHour.server >= 1 ? "blink" : ""}
           >
             {data.errors.lastHour.server}건
           </Content>
@@ -132,25 +150,29 @@ export const Monitoring = () => {
         <DeviceTypeChart devices={data.devices} />
 
         <SideContainer>
-          <Content width={"228"} height={"85"} title="실시간 동시접속">
-            {data.realtime.concurrent.total}명
-          </Content>
-          <Content
-            width={"228"}
-            height={"85"}
-            textColor="#000000"
-            backColor="#F7F7F7"
-            title="동시접속 기록"
-          >
-            <Flex alignItems="end" gap={4}>
-              <Text fontSize={15} fontWeight={600}>
-                최대
-              </Text>
-              {data.timeline.concurrentMax}
-              <Text>평균</Text>
-              {data.timeline.concurrentAvg}
-            </Flex>
-          </Content>
+            <Content
+                width="228"
+                height="85"
+                textColor={((data.performance.server.avgResponseTime ?? 0) / 1000) >= 2 ? "red" : "#000000"}
+                backColor="#F7F7F7"
+                title="서버 평균 응답시간"
+                className={((data.performance.server.avgResponseTime ?? 0) / 1000) >= 2 ? "blink" : ""}
+            >
+                {((data.performance.server.avgResponseTime ?? 0) / 1000).toFixed(2)}초
+            </Content>
+
+
+
+            <Content
+                width="228"
+                height="85"
+                textColor="#000000"
+                backColor="#F7F7F7"
+                title="최대 서버 응답시간"
+            >
+                {((data.performance.server.maxResponseTime ?? 0) / 1000).toFixed(2)}초
+            </Content>
+
         </SideContainer>
         <ConcurrentUsersCount timeline={data.timeline} />
         </Flex>
@@ -213,25 +235,41 @@ export const Monitoring = () => {
           </FlexContent>
         </FlexContainer>
         </Flex>
-        <Content backColor="#31D254" width={"352"} title="원서 접수 성공">
+        <Content width={"352"}  textColor="#000000"
+                 backColor="#F7F7F7" title="원서 접수 성공">
           {data.submissions.success}명
         </Content>
-        <Content backColor="#FF3737" width={"352"} title="원서 접수중 실패">
-          {data.submissions.failed}명
+        <Content
+          width={"352"}
+          title="원서 접수 실패"
+          textColor={data.submissions.failed >= 1 ? "red" : "#000000"}
+          backColor="#F7F7F7"
+          className={data.submissions.failed >= 1 ? "blink" : ""}
+        >
+          {data.submissions.failed}번
         </Content>
-        <Content backColor="#31D254" width={"352"} title="원서 취소 성공">
-          {data.cancellations.success}명
-        </Content>
-        <Content backColor="#FF3737" width={"352"} title="원서 취소 실패">
-          {data.cancellations.failed}명
+        <Content textColor="#000000"
+                 backColor="#F7F7F7" width={"352"} title="원서 취소 성공">
+          {data.cancellations.success}번
         </Content>
         <Content
-          backColor="#FF3737"
+          width={"352"}
+          title="원서 취소 실패"
+          textColor={data.cancellations.failed >= 1 ? "red" : "#000000"}
+          backColor="#F7F7F7"
+          className={data.cancellations.failed >= 1 ? "blink" : ""}
+        >
+          {data.cancellations.failed}번
+        </Content>
+        <Content
           height={"100"}
           width={"352"}
           title="원서 PDF 다운로드 실패"
+          textColor={data.pdf.download.failed >= 1 ? "red" : "#000000"}
+          backColor="#F7F7F7"
+          className={data.pdf.download.failed >= 1 ? "blink" : ""}
         >
-          {data.pdf.download.failed}명
+          {data.pdf.download.failed}번
         </Content>
         </Flex>
 

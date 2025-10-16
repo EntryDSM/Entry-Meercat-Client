@@ -18,6 +18,7 @@ interface ITextType {
   textAlign?: Property.TextAlign;
   isCursor?: boolean;
   isMedia?: boolean; 
+  className?: string;
 }
 
 export const Text = ({
@@ -25,7 +26,7 @@ export const Text = ({
   children,
   fontSize = 16,
   fontWeight = 500,
-  color = '#000000',
+  color,
   position,
   isOverFlow,
   width = 'fit-content',
@@ -37,6 +38,7 @@ export const Text = ({
   isSpan = false,
   isCursor,
   isMedia = false, 
+  className,
 }: ITextType) => {
   const [isMobile, setIsMobile] = useState(false);
 
@@ -73,7 +75,7 @@ export const Text = ({
   };
 
   return (
-    <div onClick={onClick} style={style}>
+    <div onClick={onClick} style={style} className={className}>
       {children}
     </div>
   );

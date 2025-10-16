@@ -1,26 +1,61 @@
-import styled from "@emotion/styled"
-import { Text } from "../design-token"
+import styled from "@emotion/styled";
+import { Text } from "../design-token";
 
 interface IContentType {
-  title : string,
-  children: React.ReactNode,
-  width?: string,
-  height?: string
-  isCenter?: boolean
-  textColor?: string,
-  backColor?: string
+    title: string;
+    children: React.ReactNode;
+    width?: string;
+    height?: string;
+    isCenter?: boolean;
+    textColor?: string;
+    backColor?: string;
+    className?: string;
 }
 
-export const Content = ({width = 'auto', height = '100', title, children, isCenter = false, textColor = "#ffffff", backColor="#FF7E36"}: IContentType) => {
-  return (
-    <Container backColor={backColor} isCenter={isCenter} width={width} height={height}  >
-      <Text fontSize="clamp(12px, 1.2vw, 16px)" fontWeight={300} color={textColor}>{title}</Text>
-      <Text fontSize="clamp(20px, 2.5vw, 36px)" fontWeight={600} color={textColor}>{children}</Text>
-    </Container>
-  )
-}
+export const Content = ({
+                            width = 'auto',
+                            height = '100',
+                            title,
+                            children,
+                            isCenter = false,
+                            textColor = "#ffffff",
+                            backColor = "#FF7E36",
+                            className, // className 받기
+                        }: IContentType) => {
+    const isBlinking = className?.includes('blink');
 
-const Container = styled.div<{ backColor: string; width: string; height: string; isCenter: boolean }>`
+    return (
+        <Container
+            backColor={backColor}
+            isCenter={isCenter}
+            width={width}
+            height={height}
+        >
+            <Text
+                fontSize="clamp(12px, 1.2vw, 16px)"
+                fontWeight={300}
+                color={textColor}
+            >
+                {title}
+            </Text>
+            <Text
+                fontSize="clamp(20px, 2.5vw, 36px)"
+                fontWeight={600}
+                className={isBlinking ? className : ''}
+                color={isBlinking ? undefined : textColor}
+            >
+                {children}
+            </Text>
+        </Container>
+    );
+};
+
+const Container = styled.div<{
+    backColor: string;
+    width: string;
+    height: string;
+    isCenter: boolean;
+}>`
     width: ${({ width }) => (width === 'auto' ? 'auto' : `${width}px`)};
     height: ${({ height }) => (height === 'auto' ? 'auto' : `${height}px`)};
     padding: clamp(8px, 1vh, 12px) clamp(10px, 1vw, 14px);
