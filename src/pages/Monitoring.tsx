@@ -132,11 +132,12 @@ export const Monitoring = () => {
         <DeviceTypeChart devices={data.devices} />
 
         <SideContainer>
-          <Content width={"228"} title="실시간 동시접속">
+          <Content width={"228"} height={"85"} title="실시간 동시접속">
             {data.realtime.concurrent.total}명
           </Content>
           <Content
             width={"228"}
+            height={"85"}
             textColor="#000000"
             backColor="#F7F7F7"
             title="동시접속 기록"
@@ -155,16 +156,6 @@ export const Monitoring = () => {
         </Flex>
 
         <Flex gap={12}>
-        <ColumnContainer>
-          <Content
-            width="204"
-            backColor="#ffffff"
-            textColor="#000000"
-            title="최근 1시간 클라이언트 오류"
-          >
-            {data.errors.lastHour.client}건
-          </Content>
-        </ColumnContainer>
 
         <Flex isColumn gap={2}>
 
@@ -221,42 +212,12 @@ export const Monitoring = () => {
             {data.realtime.concurrent.byPageType.USER}명
           </FlexContent>
         </FlexContainer>
-        <Content
-          width={"476"}
-          textColor="#000000"
-          backColor="#F7F7F7"
-          title="서버 응답 타임아웃"
-        >
-          <Flex alignItems="end" gap={8}>
-            <Text fontSize={15} fontWeight={600}>
-              최근 1시간
-            </Text>
-            {data.serverTimeout.lastHour}회<Text>전체</Text>
-            {data.serverTimeout.total}회
-          </Flex>
-        </Content>
         </Flex>
-        <Content
-          textColor="#000000"
-          backColor="#F7F7F7"
-          width={"352"}
-          title="실시간 원서 접수 중"
-        >
-          {data.submissions.inProgress}명
-        </Content>
         <Content backColor="#31D254" width={"352"} title="원서 접수 성공">
           {data.submissions.success}명
         </Content>
         <Content backColor="#FF3737" width={"352"} title="원서 접수중 실패">
           {data.submissions.failed}명
-        </Content>
-        <Content
-          textColor="#000000"
-          backColor="#F7F7F7"
-          width={"352"}
-          title="원서 접수중 미제출 이탈"
-        >
-          {data.submissions.abandoned}명
         </Content>
         <Content backColor="#31D254" width={"352"} title="원서 취소 성공">
           {data.cancellations.success}명
@@ -266,6 +227,7 @@ export const Monitoring = () => {
         </Content>
         <Content
           backColor="#FF3737"
+          height={"100"}
           width={"352"}
           title="원서 PDF 다운로드 실패"
         >
@@ -362,7 +324,7 @@ const ColumnContainer = styled.div`
   display: flex;
   gap: 8px;
   width: 228px;
-  min-height: 200px;
+  min-height: 100px;
   flex-direction: column;
 
   @media (max-width: 768px) {
@@ -372,14 +334,15 @@ const ColumnContainer = styled.div`
 `;
 
 const FlexContainer = styled.div`
-  padding: 12px;
+  padding: 6px;
   border-radius: 12px;
+  height: 100px;
   border: 1px solid #cccccc;
   display: flex;
   justify-content: center;
   align-items: center;
   gap: 8px;
-  min-height: 90px;
+  min-height: 110px;
   grid-column: span 2;
 
   @media (max-width: 768px) {
@@ -402,10 +365,10 @@ const SideContainer = styled.div`
 
 const CommitContent = styled.div`
   width: 100%;
-  border-radius: 8px;
-  background-color: #f7f7f7;
+  border-radius: 2px;
   font-size: clamp(12px, 1vw, 14px);
-  color: #000000;
+  color: red;
+  font-weight: bold;
   display: flex;
   align-items: center;
   padding: clamp(4px, 0.5vh, 6px) clamp(8px, 0.8vw, 10px);

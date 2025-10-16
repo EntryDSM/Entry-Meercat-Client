@@ -53,11 +53,6 @@ export const ConcurrentUsersCount = ({
 
   return (
     <Container>
-      <Header>
-        <Title>동시 접속 기록 차트</Title>
-        <SubText>최근 접속 추이</SubText>
-      </Header>
-
       <ChartArea>
         <ResponsiveLine
           data={chartData}
@@ -171,7 +166,7 @@ const ChartModal = styled.div`
 
 const Container = styled.div`
   width: 476px;
-  height: 250px;
+  height: 200px;
   border-radius: 14px;
   background: #ffffff;
   border: 1px solid #ececec;
@@ -179,24 +174,6 @@ const Container = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-`;
-
-const Header = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-end;
-  margin-bottom: 6px;
-`;
-
-const Title = styled.div`
-  font-size: 16px;
-  font-weight: 600;
-  color: #111;
-`;
-
-const SubText = styled.div`
-  font-size: 13px;
-  color: #777;
 `;
 
 const ChartArea = styled.div`
