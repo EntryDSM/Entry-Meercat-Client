@@ -43,11 +43,11 @@ export const Monitoring = () => {
   return (
     <ResponsiveContainer>
       <HeaderSection>
-        <Text fontSize={22} color={"#5F5F5F"}>
-          EntryDSM Client Monitoring
+        <Text fontSize={16} color={"#5F5F5F"}>
+          EntryDSM Meercat Monitoring
         </Text>
         <Text fontSize={32} fontWeight={700} color="#000000">
-          라이브 서버
+          실시간 모니터링
         </Text>
       </HeaderSection>
 
