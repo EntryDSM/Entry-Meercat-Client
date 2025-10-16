@@ -69,13 +69,13 @@ export const Monitoring = () => {
           textColor="#000000"
           backColor="#F7F7F7"
           width={"228"}
-          title="서버 API 정상"
+          title="최근 서버 API OK"
         >
           {data.apiStatus.successRequests}건
         </Content>
 
-        <Content width={"228"} title="서버 API 오류">
-          {data.apiStatus.errorRequests}건
+        <Content width={"228"} textColor="#000000" backColor="#F7F7F7" title="최근 서버 API 에러">
+            {data.errors.lastHour.server}건
         </Content>
 
         <Content width={"476"} title="총 API 요청">
@@ -95,7 +95,7 @@ export const Monitoring = () => {
         <Content width="476" title="사용자 평균 체류시간">
           {data.visitorStats.avgStayTime}
         </Content>
-        <Content width="228" title="클라이언트 DOM 시간">
+        <Content width="228"  textColor="#000000" backColor="#F7F7F7" title="클라이언트 로드 시간">
           {data.performance.client.avgDomLoadTime ?? 0}ms
         </Content>
 
