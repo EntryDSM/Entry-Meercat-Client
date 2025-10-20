@@ -79,10 +79,15 @@ export const Monitoring = () => {
         // 이전 데이터와 비교
         if (prevDataRef.current) {
           // API 요청 수 증가 체크
-          if (newData.apiStatus.totalRequests > prevDataRef.current.apiStatus.totalRequests) {
+          const requestDiff = newData.apiStatus.totalRequests - prevDataRef.current.apiStatus.totalRequests;
+          if (requestDiff > 0) {
             setApiRequestIncreased(true);
             setTimeout(() => setApiRequestIncreased(false), 500);
-            playLowBeep(); // 낮은 음으로 알림
+
+            // 증가한 횟수만큼 소리 재생
+            for (let i = 0; i < requestDiff; i++) {
+              setTimeout(() => playLowBeep(), i * 200); // 200ms 간격으로 재생
+            }
           }
 
           // 서버 에러 증가 체크 (삐 소리)
