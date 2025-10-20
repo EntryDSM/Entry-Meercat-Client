@@ -1,17 +1,22 @@
 import { createBrowserRouter } from "react-router-dom";
-import { Monitoring, ApiLogs, ApiErrors } from "./pages";
+import { Monitoring, ApiLogs, ApiErrors, Login } from "./pages";
+import { ProtectedRoute } from "./components";
 
 export const router = createBrowserRouter([
   {
+    path: '/login',
+    element: <Login/>
+  },
+  {
     path: '/',
-    element: <Monitoring/>
+    element: <ProtectedRoute><Monitoring/></ProtectedRoute>
   },
   {
     path: '/api-logs',
-    element: <ApiLogs/>
+    element: <ProtectedRoute><ApiLogs/></ProtectedRoute>
   },
   {
     path: '/api-errors',
-    element: <ApiErrors/>
+    element: <ProtectedRoute><ApiErrors/></ProtectedRoute>
   }
 ])
