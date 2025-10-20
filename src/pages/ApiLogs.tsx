@@ -7,6 +7,7 @@ export const ApiLogs = () => {
   const [data, setData] = useState<ApiLogsData | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [showFilter, setShowFilter] = useState(false);
 
   // 필터 상태
   const [page, setPage] = useState(1);
@@ -20,9 +21,11 @@ export const ApiLogs = () => {
     setLoading(true);
     setError(null);
     try {
+      // 최대 1000건까지만 조회 가능
+      const maxLimit = Math.min(limit, 1000);
       const response = await fetchApiLogs({
         page,
-        limit,
+        limit: maxLimit,
         sessionId: sessionId || undefined,
         endpoint: endpoint || undefined,
         startDate: startDate || undefined,
@@ -39,6 +42,9 @@ export const ApiLogs = () => {
 
   useEffect(() => {
     loadLogs();
+    // 3초마다 자동 새로고침
+    const interval = setInterval(loadLogs, 3000);
+    return () => clearInterval(interval);
   }, [page, limit]);
 
   const handleFilter = () => {
@@ -104,88 +110,79 @@ export const ApiLogs = () => {
       <Header>
         <Title>API 로그 모니터링</Title>
         <Subtitle>API 요청 로그 조회 및 분석</Subtitle>
+        <FilterToggleButton onClick={() => setShowFilter(!showFilter)}>
+          {showFilter ? '필터 숨기기 ▲' : '필터 보기 ▼'}
+        </FilterToggleButton>
       </Header>
 
-      <FilterSection>
-        <FilterTitle>필터 설정</FilterTitle>
-        <FilterGrid>
-          <FilterGroup>
-            <Label>세션 ID</Label>
-            <Input
-              type="text"
-              value={sessionId}
-              onChange={(e) => setSessionId(e.target.value)}
-              placeholder="세션 ID를 입력하세요"
-            />
-          </FilterGroup>
+      {showFilter && (
+        <FilterSection>
+          <FilterTitle>필터 설정</FilterTitle>
+          <FilterGrid>
+            <FilterGroup>
+              <Label>세션 ID</Label>
+              <Input
+                type="text"
+                value={sessionId}
+                onChange={(e) => setSessionId(e.target.value)}
+                placeholder="세션 ID를 입력하세요"
+              />
+            </FilterGroup>
 
-          <FilterGroup>
-            <Label>엔드포인트</Label>
-            <Input
-              type="text"
-              value={endpoint}
-              onChange={(e) => setEndpoint(e.target.value)}
-              placeholder="예: /schedule/all"
-            />
-          </FilterGroup>
+            <FilterGroup>
+              <Label>엔드포인트</Label>
+              <Input
+                type="text"
+                value={endpoint}
+                onChange={(e) => setEndpoint(e.target.value)}
+                placeholder="예: /schedule/all"
+              />
+            </FilterGroup>
 
-          <FilterGroup>
-            <Label>시작 날짜</Label>
-            <Input
-              type="datetime-local"
-              value={startDate}
-              onChange={(e) => setStartDate(e.target.value)}
-            />
-          </FilterGroup>
+            <FilterGroup>
+              <Label>시작 날짜</Label>
+              <Input
+                type="datetime-local"
+                value={startDate}
+                onChange={(e) => setStartDate(e.target.value)}
+              />
+            </FilterGroup>
 
-          <FilterGroup>
-            <Label>종료 날짜</Label>
-            <Input
-              type="datetime-local"
-              value={endDate}
-              onChange={(e) => setEndDate(e.target.value)}
-            />
-          </FilterGroup>
+            <FilterGroup>
+              <Label>종료 날짜</Label>
+              <Input
+                type="datetime-local"
+                value={endDate}
+                onChange={(e) => setEndDate(e.target.value)}
+              />
+            </FilterGroup>
 
-          <FilterGroup>
-            <Label>페이지 크기</Label>
-            <Select value={limit} onChange={(e) => setLimit(Number(e.target.value))}>
-              <option value={10}>10개</option>
-              <option value={20}>20개</option>
-              <option value={50}>50개</option>
-              <option value={100}>100개</option>
-            </Select>
-          </FilterGroup>
-        </FilterGrid>
+            <FilterGroup>
+              <Label>페이지 크기 (최대 1000)</Label>
+              <Select value={limit} onChange={(e) => setLimit(Number(e.target.value))}>
+                <option value={10}>10개</option>
+                <option value={20}>20개</option>
+                <option value={50}>50개</option>
+                <option value={100}>100개</option>
+                <option value={500}>500개</option>
+                <option value={1000}>1000개</option>
+              </Select>
+            </FilterGroup>
+          </FilterGrid>
 
-        <ButtonGroup>
-          <Button onClick={handleFilter} disabled={loading}>
-            {loading ? '로딩 중...' : '조회'}
-          </Button>
-          <ResetButton onClick={handleReset}>초기화</ResetButton>
-        </ButtonGroup>
-      </FilterSection>
+          <ButtonGroup>
+            <Button onClick={handleFilter} disabled={loading}>
+              {loading ? '로딩 중...' : '조회'}
+            </Button>
+            <ResetButton onClick={handleReset}>초기화</ResetButton>
+          </ButtonGroup>
+        </FilterSection>
+      )}
 
       {error && <ErrorMessage>{error}</ErrorMessage>}
 
       {data && (
         <>
-          <StatsSection>
-            <StatBox>
-              <StatLabel>전체 로그</StatLabel>
-              <StatValue>{data.meta.totalItems.toLocaleString()}건</StatValue>
-            </StatBox>
-            <StatBox>
-              <StatLabel>현재 페이지</StatLabel>
-              <StatValue>
-                {data.meta.currentPage} / {data.meta.totalPages}
-              </StatValue>
-            </StatBox>
-            <StatBox>
-              <StatLabel>표시 개수</StatLabel>
-              <StatValue>{data.logs.length}건</StatValue>
-            </StatBox>
-          </StatsSection>
 
           <TableContainer>
             <Table>
@@ -297,7 +294,23 @@ const Title = styled.h1`
 const Subtitle = styled.p`
   font-size: 14px;
   color: #666;
-  margin: 0;
+  margin: 0 0 16px 0;
+`;
+
+const FilterToggleButton = styled.button`
+  padding: 10px 20px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+
+  &:hover {
+    background-color: #0056b3;
+  }
 `;
 
 const FilterSection = styled.div`
@@ -402,33 +415,6 @@ const ErrorMessage = styled.div`
   border-radius: 4px;
   margin-bottom: 20px;
   border: 1px solid #f5c6cb;
-`;
-
-const StatsSection = styled.div`
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 16px;
-  margin-bottom: 20px;
-`;
-
-const StatBox = styled.div`
-  background-color: white;
-  padding: 20px;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  text-align: center;
-`;
-
-const StatLabel = styled.div`
-  font-size: 13px;
-  color: #666;
-  margin-bottom: 8px;
-`;
-
-const StatValue = styled.div`
-  font-size: 24px;
-  font-weight: 700;
-  color: #333;
 `;
 
 const TableContainer = styled.div`
