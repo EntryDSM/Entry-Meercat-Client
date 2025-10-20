@@ -17,7 +17,7 @@ export const Monitoring = () => {
   const prevDataRef = useRef<DashboardData | null>(null);
   const [apiRequestIncreased, setApiRequestIncreased] = useState(false);
 
-  // 삐 소리 재생 함수
+  // 에러 경고음 재생 함수 (높은 음)
   const playBeep = () => {
     const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
     const beepCount = 3;
@@ -48,6 +48,25 @@ export const Monitoring = () => {
     playOnce();
   };
 
+  // API 요청 증가 알림음 재생 함수 (낮은 음)
+  const playLowBeep = () => {
+    const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+    const oscillator = audioContext.createOscillator();
+    const gainNode = audioContext.createGain();
+
+    oscillator.connect(gainNode);
+    gainNode.connect(audioContext.destination);
+
+    oscillator.frequency.value = 200; // 낮은 저음
+    oscillator.type = 'sine';
+
+    gainNode.gain.setValueAtTime(0.2, audioContext.currentTime);
+    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.15);
+
+    oscillator.start(audioContext.currentTime);
+    oscillator.stop(audioContext.currentTime + 0.15);
+  };
+
   useEffect(() => {
     const loadData = async () => {
       if (isLoadingRef.current) return;
@@ -63,10 +82,15 @@ export const Monitoring = () => {
           if (newData.apiStatus.totalRequests > prevDataRef.current.apiStatus.totalRequests) {
             setApiRequestIncreased(true);
             setTimeout(() => setApiRequestIncreased(false), 500);
+            playLowBeep(); // 낮은 음으로 알림
           }
 
           // 서버 에러 증가 체크 (삐 소리)
           if (newData.errors.lastHour.server > prevDataRef.current.errors.lastHour.server) {
+            console.log('🔊 경고음 발생:', {
+              이전: prevDataRef.current.errors.lastHour.server,
+              현재: newData.errors.lastHour.server
+            });
             playBeep();
           }
         }
