@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { ApiErrorsParams, ApiErrorsResponse } from '../types/apiErrors';
+import type { ApiErrorsParams, ApiErrorsResponse } from '../types/apiErrors';
 
 const BASE_URL = 'https://meeeeercat.ncloud.sbs/v1/error/admin';
 
