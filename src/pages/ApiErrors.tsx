@@ -211,14 +211,17 @@ export const ApiErrors = () => {
             <Table>
               <thead>
                 <tr>
-                  <Th width="60px">ID</Th>
-                  <Th width="100px">에러 타입</Th>
-                  <Th width="100px">페이지</Th>
-                  <Th width="140px">에러 카테고리</Th>
-                  <Th width="160px">에러 코드</Th>
-                  <Th width="300px">메시지</Th>
-                  <Th width="280px">세션 ID</Th>
-                  <Th width="180px">발생시간</Th>
+                  <Th width="50px">ID</Th>
+                  <Th width="70px">타입</Th>
+                  <Th width="70px">페이지</Th>
+                  <Th width="110px">카테고리</Th>
+                  <Th width="130px">에러 코드</Th>
+                  <Th width="50px">메서드</Th>
+                  <Th width="60px">상태</Th>
+                  <Th width="200px">엔드포인트</Th>
+                  <Th width="250px">메시지</Th>
+                  <Th width="240px">세션 ID</Th>
+                  <Th width="150px">발생시간</Th>
                 </tr>
               </thead>
               <tbody>
@@ -242,6 +245,33 @@ export const ApiErrors = () => {
                     </Td>
                     <Td>
                       <ErrorCodeText>{errorItem.errorCode}</ErrorCodeText>
+                    </Td>
+                    <Td>
+                      {errorItem.httpMethod ? (
+                        <HttpMethodBadge method={errorItem.httpMethod}>
+                          {errorItem.httpMethod}
+                        </HttpMethodBadge>
+                      ) : (
+                        <NullText>-</NullText>
+                      )}
+                    </Td>
+                    <Td>
+                      {errorItem.httpStatus ? (
+                        <HttpStatusText status={errorItem.httpStatus}>
+                          {errorItem.httpStatus}
+                        </HttpStatusText>
+                      ) : (
+                        <NullText>-</NullText>
+                      )}
+                    </Td>
+                    <Td>
+                      {errorItem.endpoint ? (
+                        <EndpointText title={errorItem.endpoint}>
+                          {errorItem.endpoint}
+                        </EndpointText>
+                      ) : (
+                        <NullText>-</NullText>
+                      )}
                     </Td>
                     <Td>
                       <MessageText title={errorItem.message}>
@@ -454,7 +484,7 @@ const TableContainer = styled.div`
 const Table = styled.table`
   width: 100%;
   border-collapse: collapse;
-  min-width: 1400px;
+  min-width: 1600px;
 `;
 
 const Th = styled.th<{ width?: string }>`
@@ -525,7 +555,7 @@ const MessageText = styled.span`
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  max-width: 300px;
+  max-width: 250px;
 `;
 
 const SessionId = styled.span`
@@ -533,6 +563,63 @@ const SessionId = styled.span`
   font-size: 11px;
   color: #666;
   word-break: break-all;
+`;
+
+const HttpMethodBadge = styled.span<{ method: string }>`
+  display: inline-block;
+  padding: 4px 8px;
+  background-color: ${({ method }) => {
+    switch (method) {
+      case 'GET':
+        return '#28a745';
+      case 'POST':
+        return '#007bff';
+      case 'PUT':
+        return '#ffc107';
+      case 'DELETE':
+        return '#dc3545';
+      case 'PATCH':
+        return '#17a2b8';
+      default:
+        return '#6c757d';
+    }
+  }};
+  color: white;
+  border-radius: 3px;
+  font-size: 10px;
+  font-weight: 600;
+  text-align: center;
+  min-width: 45px;
+`;
+
+const HttpStatusText = styled.span<{ status: number }>`
+  font-family: 'Consolas', 'Monaco', monospace;
+  font-size: 12px;
+  font-weight: 600;
+  color: ${({ status }) => {
+    if (status >= 200 && status < 300) return '#28a745';
+    if (status >= 300 && status < 400) return '#17a2b8';
+    if (status >= 400 && status < 500) return '#ffc107';
+    if (status >= 500) return '#dc3545';
+    return '#6c757d';
+  }};
+`;
+
+const EndpointText = styled.span`
+  font-family: 'Consolas', 'Monaco', monospace;
+  font-size: 11px;
+  color: #333;
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 200px;
+`;
+
+const NullText = styled.span`
+  color: #adb5bd;
+  font-size: 12px;
+  font-style: italic;
 `;
 
 const Pagination = styled.div`

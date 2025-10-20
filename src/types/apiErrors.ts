@@ -6,6 +6,9 @@ export interface ApiError {
   errorCategory: 'NETWORK_ERROR' | 'RUNTIME_ERROR' | 'SERVER_ERROR';
   errorCode: string;
   message: string;
+  endpoint: string | null;
+  httpMethod: string | null;
+  httpStatus: number | null;
   createdAt: string;
   resolved?: boolean;
   resolvedAt?: string;
