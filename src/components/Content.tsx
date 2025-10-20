@@ -1,4 +1,5 @@
 import styled from "@emotion/styled";
+import { keyframes } from "@emotion/react";
 import { Text } from "../design-token";
 
 interface IContentType {
@@ -12,6 +13,21 @@ interface IContentType {
     className?: string;
 }
 
+const increaseAnimation = keyframes`
+  0% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  50% {
+    transform: translateY(-10px);
+    opacity: 0.7;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+`;
+
 export const Content = ({
                             width = 'auto',
                             height = '100',
@@ -23,6 +39,7 @@ export const Content = ({
                             className, // className 받기
                         }: IContentType) => {
     const isBlinking = className?.includes('blink');
+    const isIncreasing = className?.includes('increase-animation');
 
     return (
         <Container
@@ -38,14 +55,15 @@ export const Content = ({
             >
                 {title}
             </Text>
-            <Text
+            <AnimatedText
                 fontSize="clamp(20px, 2.5vw, 36px)"
                 fontWeight={600}
-                className={isBlinking ? className : ''}
+                className={className}
                 color={isBlinking ? undefined : textColor}
+                isIncreasing={isIncreasing}
             >
                 {children}
-            </Text>
+            </AnimatedText>
         </Container>
     );
 };
@@ -65,4 +83,12 @@ const Container = styled.div<{
     flex-direction: column;
     gap: clamp(4px, 0.5vh, 6px);
     background-color: ${({ backColor }) => backColor};
+`;
+
+const AnimatedText = styled(Text)<{ isIncreasing?: boolean }>`
+    ${({ isIncreasing }) =>
+        isIncreasing &&
+        `
+        animation: ${increaseAnimation} 0.5s ease-out;
+    `}
 `;

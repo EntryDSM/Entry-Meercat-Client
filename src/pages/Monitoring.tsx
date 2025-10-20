@@ -14,6 +14,39 @@ import type { DashboardData } from "../types/dashboard";
 export const Monitoring = () => {
   const [data, setData] = useState<DashboardData | null>(null);
   const isLoadingRef = useRef(false);
+  const prevDataRef = useRef<DashboardData | null>(null);
+  const [apiRequestIncreased, setApiRequestIncreased] = useState(false);
+
+  // 삐 소리 재생 함수
+  const playBeep = () => {
+    const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+    const beepCount = 3;
+    let currentBeep = 0;
+
+    const playOnce = () => {
+      const oscillator = audioContext.createOscillator();
+      const gainNode = audioContext.createGain();
+
+      oscillator.connect(gainNode);
+      gainNode.connect(audioContext.destination);
+
+      oscillator.frequency.value = 800;
+      oscillator.type = 'sine';
+
+      gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+      gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1);
+
+      oscillator.start(audioContext.currentTime);
+      oscillator.stop(audioContext.currentTime + 0.1);
+
+      currentBeep++;
+      if (currentBeep < beepCount) {
+        setTimeout(playOnce, 200);
+      }
+    };
+
+    playOnce();
+  };
 
   useEffect(() => {
     const loadData = async () => {
@@ -22,7 +55,24 @@ export const Monitoring = () => {
       isLoadingRef.current = true;
       try {
         const response = await fetchDashboardData();
-        setData(response.data);
+        const newData = response.data;
+
+        // 이전 데이터와 비교
+        if (prevDataRef.current) {
+          // API 요청 수 증가 체크
+          if (newData.apiStatus.totalRequests > prevDataRef.current.apiStatus.totalRequests) {
+            setApiRequestIncreased(true);
+            setTimeout(() => setApiRequestIncreased(false), 500);
+          }
+
+          // 서버 에러 증가 체크 (삐 소리)
+          if (newData.errors.lastHour.server > prevDataRef.current.errors.lastHour.server) {
+            playBeep();
+          }
+        }
+
+        prevDataRef.current = newData;
+        setData(newData);
       } catch (error) {
         console.error("Failed to fetch dashboard data:", error);
       } finally {
@@ -91,7 +141,7 @@ export const Monitoring = () => {
             {data.errors.lastHour.server}건
         </Content>
 
-        <Content width={"476"} title="총 API 요청">
+        <Content width={"476"} title="총 API 요청" className={apiRequestIncreased ? "increase-animation" : ""}>
           {data.apiStatus.totalRequests}건
         </Content>
         </Flex>
