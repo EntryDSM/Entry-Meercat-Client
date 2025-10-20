@@ -17,6 +17,11 @@ export const ApiErrors = () => {
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
 
+  // 에러 증가 알림 팝업 상태
+  const [previousTotalErrors, setPreviousTotalErrors] = useState<number | null>(null);
+  const [showErrorPopup, setShowErrorPopup] = useState(false);
+  const [errorIncrease, setErrorIncrease] = useState(0);
+
   const loadErrors = async () => {
     setLoading(true);
     setError(null);
@@ -31,6 +36,17 @@ export const ApiErrors = () => {
         startDate: startDate || undefined,
         endDate: endDate || undefined,
       });
+
+      const newTotalErrors = response.data.meta.totalItems;
+
+      // 이전 에러 개수와 비교하여 증가했는지 확인
+      if (previousTotalErrors !== null && newTotalErrors > previousTotalErrors) {
+        const increase = newTotalErrors - previousTotalErrors;
+        setErrorIncrease(increase);
+        setShowErrorPopup(true);
+      }
+
+      setPreviousTotalErrors(newTotalErrors);
       setData(response.data);
     } catch (err) {
       setError('에러 데이터를 불러오는데 실패했습니다.');
@@ -46,6 +62,16 @@ export const ApiErrors = () => {
     const interval = setInterval(loadErrors, 3000);
     return () => clearInterval(interval);
   }, [page, limit]);
+
+  // 팝업 자동 숨김 (5초 후)
+  useEffect(() => {
+    if (showErrorPopup) {
+      const timer = setTimeout(() => {
+        setShowErrorPopup(false);
+      }, 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [showErrorPopup]);
 
   const handleFilter = () => {
     setPage(1);
@@ -96,6 +122,17 @@ export const ApiErrors = () => {
 
   return (
     <Container>
+      {/* 에러 증가 알림 팝업 */}
+      {showErrorPopup && (
+        <ErrorPopupOverlay>
+          <ErrorPopup>
+            <PopupIcon>⚠️</PopupIcon>
+            <PopupTitle>새로운 에러 발생!</PopupTitle>
+            <PopupMessage>{errorIncrease}개의 새로운 에러가 발생했습니다</PopupMessage>
+          </ErrorPopup>
+        </ErrorPopupOverlay>
+      )}
+
       <Header>
         <Title>API 에러 모니터링</Title>
         <Subtitle>API 에러 조회 및 분석</Subtitle>
@@ -535,4 +572,70 @@ const PageInfo = styled.span`
   color: #333;
   min-width: 80px;
   text-align: center;
+`;
+
+// 에러 알림 팝업 스타일
+const ErrorPopupOverlay = styled.div`
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  pointer-events: none;
+`;
+
+const ErrorPopup = styled.div`
+  background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
+  color: white;
+  padding: 32px 48px;
+  border-radius: 16px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  text-align: center;
+  min-width: 400px;
+  animation: popupSlideIn 0.3s ease-out;
+  pointer-events: auto;
+
+  @keyframes popupSlideIn {
+    from {
+      transform: scale(0.8) translateY(-20px);
+      opacity: 0;
+    }
+    to {
+      transform: scale(1) translateY(0);
+      opacity: 1;
+    }
+  }
+`;
+
+const PopupIcon = styled.div`
+  font-size: 64px;
+  margin-bottom: 16px;
+  animation: iconBounce 0.5s ease-out;
+
+  @keyframes iconBounce {
+    0%, 100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-10px);
+    }
+  }
+`;
+
+const PopupTitle = styled.h2`
+  font-size: 28px;
+  font-weight: 700;
+  margin: 0 0 12px 0;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+`;
+
+const PopupMessage = styled.p`
+  font-size: 18px;
+  font-weight: 500;
+  margin: 0;
+  opacity: 0.95;
 `;
