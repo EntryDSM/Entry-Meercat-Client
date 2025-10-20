@@ -236,30 +236,8 @@ export const Monitoring = () => {
         </FlexContainer>
         </Flex>
         <Content width={"352"}  textColor="#000000"
-                 backColor="#F7F7F7" title="원서 접수 성공">
-          {data.submissions.success}명
-        </Content>
-        <Content
-          width={"352"}
-          title="원서 접수 실패"
-          textColor={data.submissions.failed >= 1 ? "red" : "#000000"}
-          backColor="#F7F7F7"
-          className={data.submissions.failed >= 1 ? "blink" : ""}
-        >
-          {data.submissions.failed}번
-        </Content>
-        <Content textColor="#000000"
-                 backColor="#F7F7F7" width={"352"} title="원서 취소 성공">
-          {data.cancellations.success}번
-        </Content>
-        <Content
-          width={"352"}
-          title="원서 취소 실패"
-          textColor={data.cancellations.failed >= 1 ? "red" : "#000000"}
-          backColor="#F7F7F7"
-          className={data.cancellations.failed >= 1 ? "blink" : ""}
-        >
-          {data.cancellations.failed}번
+                 backColor="#F7F7F7" title="세션 수">
+          {data.visitorStats.totalSessions}명
         </Content>
         <Content
           width={"352"}

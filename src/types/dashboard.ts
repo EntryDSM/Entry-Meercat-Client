@@ -109,4 +109,8 @@ export interface DashboardData {
     avgRevisitCount: number;
     avgStayTime: string;
   };
+  concurrentLastHour: {
+    max: number;
+    avg: number;
+  };
 }
