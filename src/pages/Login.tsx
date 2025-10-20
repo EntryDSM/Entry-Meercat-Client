@@ -9,7 +9,7 @@ const LoginContainer = styled.div`
   justify-content: center;
   align-items: center;
   min-height: 100vh;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: white;
 `;
 
 const LoginBox = styled.div`
@@ -61,7 +61,7 @@ const Input = styled.input`
 
 const Button = styled.button`
   padding: 12px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #667eea;
   color: white;
   border: none;
   border-radius: 5px;
@@ -148,11 +148,6 @@ export const Login = () => {
           <Button type="submit">로그인</Button>
         </Form>
         {error && <ErrorMessage>{error}</ErrorMessage>}
-        <InfoMessage>
-          테스트 계정<br />
-          아이디: entrydsm<br />
-          비밀번호: eoakrhxkfcnf
-        </InfoMessage>
       </LoginBox>
     </LoginContainer>
   );
