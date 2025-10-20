@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useContext, useState } from 'react';
 import type { ReactNode } from 'react';
 
 interface AuthContextType {
@@ -10,15 +10,10 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
-
-  useEffect(() => {
-    // 로컬 스토리지에서 인증 상태 확인
-    const authStatus = localStorage.getItem('isAuthenticated');
-    if (authStatus === 'true') {
-      setIsAuthenticated(true);
-    }
-  }, []);
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() => {
+    // 초기 렌더링 시 localStorage에서 인증 상태 확인
+    return localStorage.getItem('isAuthenticated') === 'true';
+  });
 
   const login = (username: string, password: string): boolean => {
     // 간단한 로그인 로직 (실제로는 API 호출)
