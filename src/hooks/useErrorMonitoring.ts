@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { fetchDashboardData } from '../apis/dashboard';
+import { fetchApiErrors } from '../apis/apiErrors';
 
 export interface ServerError {
   id: string;
@@ -7,6 +8,9 @@ export interface ServerError {
   endpoint: string;
   httpStatus: number | null;
   createdAt: string;
+  errorCode?: string;
+  errorType?: 'CLIENT' | 'SERVER';
+  errorCategory?: string;
 }
 
 export const useErrorMonitoring = () => {
@@ -30,8 +34,35 @@ export const useErrorMonitoring = () => {
           );
 
           if (newErrorList.length > 0) {
-            setNewErrors(newErrorList);
-            setShowErrorPopup(true);
+            // error list API에서 상세 정보 가져오기
+            try {
+              const errorListResponse = await fetchApiErrors({
+                page: 1,
+                limit: 100, // 최근 에러 충분히 가져오기
+              });
+
+              // ID를 매칭하여 상세 정보 추가
+              const enrichedErrors = newErrorList.map(dashboardError => {
+                const detailedError = errorListResponse.data.errors.find(
+                  e => e.id === dashboardError.id
+                );
+
+                return {
+                  ...dashboardError,
+                  errorCode: detailedError?.errorCode,
+                  errorType: detailedError?.errorType,
+                  errorCategory: detailedError?.errorCategory,
+                };
+              });
+
+              setNewErrors(enrichedErrors);
+              setShowErrorPopup(true);
+            } catch (detailErr) {
+              // 상세 정보를 못 가져와도 기본 정보는 표시
+              console.error('Failed to fetch detailed error info:', detailErr);
+              setNewErrors(newErrorList);
+              setShowErrorPopup(true);
+            }
           }
         }
 

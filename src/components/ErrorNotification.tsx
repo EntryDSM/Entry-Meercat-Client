@@ -19,6 +19,25 @@ export const ErrorNotification = ({ errors, onClose }: ErrorNotificationProps) =
     });
   };
 
+  const getErrorTypeColor = (type?: string) => {
+    if (!type) return '#6c757d';
+    return type === 'CLIENT' ? '#dc3545' : '#ffc107';
+  };
+
+  const getErrorCategoryColor = (category?: string) => {
+    if (!category) return '#6c757d';
+    switch (category) {
+      case 'NETWORK_ERROR':
+        return '#17a2b8';
+      case 'RUNTIME_ERROR':
+        return '#dc3545';
+      case 'SERVER_ERROR':
+        return '#ffc107';
+      default:
+        return '#6c757d';
+    }
+  };
+
   return (
     <ErrorPopupOverlay onClick={onClose}>
       <ErrorPopup onClick={(e) => e.stopPropagation()}>
@@ -26,7 +45,25 @@ export const ErrorNotification = ({ errors, onClose }: ErrorNotificationProps) =
         <ErrorList>
           {errors.map((error) => (
             <ErrorItem key={error.id}>
-              <ErrorEndpoint>{error.endpoint}</ErrorEndpoint>
+              <ErrorHeader>
+                <ErrorEndpoint>{error.endpoint}</ErrorEndpoint>
+                <BadgeContainer>
+                  {error.errorType && (
+                    <Badge color={getErrorTypeColor(error.errorType)}>
+                      {error.errorType}
+                    </Badge>
+                  )}
+                  {error.errorCategory && (
+                    <Badge color={getErrorCategoryColor(error.errorCategory)}>
+                      {error.errorCategory}
+                    </Badge>
+                  )}
+                </BadgeContainer>
+              </ErrorHeader>
+              {error.errorCode && (
+                <ErrorCode>ERROR CODE: {error.errorCode}</ErrorCode>
+              )}
+              <ErrorMessage>{error.message}</ErrorMessage>
               <ErrorTime>{formatDate(error.createdAt)}</ErrorTime>
             </ErrorItem>
           ))}
@@ -92,16 +129,59 @@ const ErrorItem = styled.div`
   padding: 16px;
   border-radius: 8px;
   backdrop-filter: blur(10px);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+`;
+
+const ErrorHeader = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 4px;
 `;
 
 const ErrorEndpoint = styled.div`
   font-size: 16px;
   font-weight: 600;
-  margin-bottom: 8px;
   font-family: 'Consolas', 'Monaco', monospace;
+  flex: 1;
+`;
+
+const BadgeContainer = styled.div`
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+`;
+
+const Badge = styled.span<{ color: string }>`
+  display: inline-block;
+  padding: 4px 8px;
+  background-color: ${({ color }) => color};
+  color: white;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 600;
+  text-align: center;
+  white-space: nowrap;
+`;
+
+const ErrorCode = styled.div`
+  font-size: 13px;
+  font-weight: 600;
+  font-family: 'Consolas', 'Monaco', monospace;
+  opacity: 0.95;
+`;
+
+const ErrorMessage = styled.div`
+  font-size: 13px;
+  opacity: 0.85;
+  line-height: 1.4;
 `;
 
 const ErrorTime = styled.div`
-  font-size: 14px;
-  opacity: 0.9;
+  font-size: 12px;
+  opacity: 0.75;
+  margin-top: 4px;
 `;
