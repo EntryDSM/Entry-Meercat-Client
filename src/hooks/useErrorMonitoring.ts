@@ -1,34 +1,43 @@
 import { useState, useEffect } from 'react';
-import { fetchApiErrors } from '../apis/apiErrors';
-import type { ApiError } from '../types/apiErrors';
+import { fetchDashboardData } from '../apis/dashboard';
+
+export interface ServerError {
+  id: string;
+  message: string;
+  endpoint: string;
+  httpStatus: number | null;
+  createdAt: string;
+}
 
 export const useErrorMonitoring = () => {
-  const [previousTotalErrors, setPreviousTotalErrors] = useState<number | null>(null);
+  const [previousErrorIds, setPreviousErrorIds] = useState<Set<string>>(new Set());
   const [showErrorPopup, setShowErrorPopup] = useState(false);
-  const [newErrors, setNewErrors] = useState<ApiError[]>([]);
+  const [newErrors, setNewErrors] = useState<ServerError[]>([]);
 
   useEffect(() => {
     const checkErrors = async () => {
       try {
-        const response = await fetchApiErrors({
-          page: 1,
-          limit: 10, // 최근 에러 10개 가져오기
-        });
+        const response = await fetchDashboardData();
+        const recentServerErrors = response.data.errors.recentServerErrors;
 
-        const newTotalErrors = response.data.meta.totalItems;
+        // 새로운 에러 ID 세트 생성
+        const currentErrorIds = new Set(recentServerErrors.map(e => e.id));
 
-        // 이전 에러 개수와 비교하여 증가했는지 확인
-        if (previousTotalErrors !== null && newTotalErrors > previousTotalErrors) {
-          const increase = newTotalErrors - previousTotalErrors;
-          // 증가한 개수만큼 최신 에러 가져오기
-          const latestErrors = response.data.errors.slice(0, Math.min(increase, 10));
-          setNewErrors(latestErrors);
-          setShowErrorPopup(true);
+        // 이전에 없던 새로운 에러 찾기
+        if (previousErrorIds.size > 0) {
+          const newErrorList = recentServerErrors.filter(
+            error => !previousErrorIds.has(error.id)
+          );
+
+          if (newErrorList.length > 0) {
+            setNewErrors(newErrorList);
+            setShowErrorPopup(true);
+          }
         }
 
-        setPreviousTotalErrors(newTotalErrors);
+        setPreviousErrorIds(currentErrorIds);
       } catch (err) {
-        console.error('Failed to fetch API errors for monitoring:', err);
+        console.error('Failed to fetch dashboard data for error monitoring:', err);
       }
     };
 
@@ -38,7 +47,7 @@ export const useErrorMonitoring = () => {
     // 3초마다 에러 체크
     const interval = setInterval(checkErrors, 3000);
     return () => clearInterval(interval);
-  }, [previousTotalErrors]);
+  }, [previousErrorIds]);
 
   // 팝업 자동 숨김 (5초 후)
   useEffect(() => {

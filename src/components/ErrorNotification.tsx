@@ -1,8 +1,8 @@
 import styled from '@emotion/styled';
-import type { ApiError } from '../types/apiErrors';
+import type { ServerError } from '../hooks/useErrorMonitoring';
 
 interface ErrorNotificationProps {
-  errors: ApiError[];
+  errors: ServerError[];
   onClose: () => void;
 }
 
@@ -26,7 +26,7 @@ export const ErrorNotification = ({ errors, onClose }: ErrorNotificationProps) =
         <ErrorList>
           {errors.map((error) => (
             <ErrorItem key={error.id}>
-              <ErrorEndpoint>{error.errorCode}</ErrorEndpoint>
+              <ErrorEndpoint>{error.endpoint}</ErrorEndpoint>
               <ErrorTime>{formatDate(error.createdAt)}</ErrorTime>
             </ErrorItem>
           ))}
