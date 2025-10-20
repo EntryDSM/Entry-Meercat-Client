@@ -16,6 +16,7 @@ export const Monitoring = () => {
   const isLoadingRef = useRef(false);
   const prevDataRef = useRef<DashboardData | null>(null);
   const [apiRequestIncreased, setApiRequestIncreased] = useState(false);
+  const [displayedApiCount, setDisplayedApiCount] = useState<number>(0);
 
   // 에러 경고음 재생 함수 (높은 음)
   const playBeep = () => {
@@ -48,7 +49,7 @@ export const Monitoring = () => {
     playOnce();
   };
 
-  // API 요청 증가 알림음 재생 함수 (낮은 음)
+  // API 요청 증가 알림음 재생 함수 (짧은 삐 소리)
   const playLowBeep = () => {
     const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
     const oscillator = audioContext.createOscillator();
@@ -57,14 +58,14 @@ export const Monitoring = () => {
     oscillator.connect(gainNode);
     gainNode.connect(audioContext.destination);
 
-    oscillator.frequency.value = 200; // 낮은 저음
+    oscillator.frequency.value = 600; // 중간 톤의 삐 소리
     oscillator.type = 'sine';
 
-    gainNode.gain.setValueAtTime(0.2, audioContext.currentTime);
-    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.15);
+    gainNode.gain.setValueAtTime(0.15, audioContext.currentTime);
+    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.05);
 
     oscillator.start(audioContext.currentTime);
-    oscillator.stop(audioContext.currentTime + 0.15);
+    oscillator.stop(audioContext.currentTime + 0.05);
   };
 
   useEffect(() => {
@@ -84,10 +85,17 @@ export const Monitoring = () => {
             setApiRequestIncreased(true);
             setTimeout(() => setApiRequestIncreased(false), 500);
 
-            // 증가한 횟수만큼 소리 재생
+            // 증가한 횟수만큼 소리 재생 + 숫자 애니메이션
+            const startCount = prevDataRef.current.apiStatus.totalRequests;
             for (let i = 0; i < requestDiff; i++) {
-              setTimeout(() => playLowBeep(), i * 200); // 200ms 간격으로 재생
+              setTimeout(() => {
+                playLowBeep();
+                setDisplayedApiCount(startCount + i + 1);
+              }, i * 100); // 100ms 간격으로 재생
             }
+          } else {
+            // 증가가 없으면 바로 표시
+            setDisplayedApiCount(newData.apiStatus.totalRequests);
           }
 
           // 서버 에러 증가 체크 (삐 소리)
@@ -98,6 +106,9 @@ export const Monitoring = () => {
             });
             playBeep();
           }
+        } else {
+          // 첫 로드 시
+          setDisplayedApiCount(newData.apiStatus.totalRequests);
         }
 
         prevDataRef.current = newData;
@@ -171,7 +182,7 @@ export const Monitoring = () => {
         </Content>
 
         <Content width={"476"} title="총 API 요청" className={apiRequestIncreased ? "increase-animation" : ""}>
-          {data.apiStatus.totalRequests}건
+          {displayedApiCount}건
         </Content>
         </Flex>
         <Flex gap={12}>
