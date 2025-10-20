@@ -6,13 +6,13 @@ import { useErrorMonitoring } from "./hooks/useErrorMonitoring"
 import "./index.css"
 
 const AppContent = () => {
-  const { showErrorPopup, errorIncrease, closePopup } = useErrorMonitoring();
+  const { showErrorPopup, newErrors, closePopup } = useErrorMonitoring();
 
   return (
     <>
       <RouterProvider router={router}/>
       {showErrorPopup && (
-        <ErrorNotification errorIncrease={errorIncrease} onClose={closePopup} />
+        <ErrorNotification errors={newErrors} onClose={closePopup} />
       )}
     </>
   );

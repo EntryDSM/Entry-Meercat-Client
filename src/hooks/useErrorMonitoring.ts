@@ -1,17 +1,18 @@
 import { useState, useEffect } from 'react';
 import { fetchApiErrors } from '../apis/apiErrors';
+import type { ApiError } from '../types/apiErrors';
 
 export const useErrorMonitoring = () => {
   const [previousTotalErrors, setPreviousTotalErrors] = useState<number | null>(null);
   const [showErrorPopup, setShowErrorPopup] = useState(false);
-  const [errorIncrease, setErrorIncrease] = useState(0);
+  const [newErrors, setNewErrors] = useState<ApiError[]>([]);
 
   useEffect(() => {
     const checkErrors = async () => {
       try {
         const response = await fetchApiErrors({
           page: 1,
-          limit: 1, // 개수만 확인하면 되므로 최소한의 데이터만 요청
+          limit: 10, // 최근 에러 10개 가져오기
         });
 
         const newTotalErrors = response.data.meta.totalItems;
@@ -19,7 +20,9 @@ export const useErrorMonitoring = () => {
         // 이전 에러 개수와 비교하여 증가했는지 확인
         if (previousTotalErrors !== null && newTotalErrors > previousTotalErrors) {
           const increase = newTotalErrors - previousTotalErrors;
-          setErrorIncrease(increase);
+          // 증가한 개수만큼 최신 에러 가져오기
+          const latestErrors = response.data.errors.slice(0, Math.min(increase, 10));
+          setNewErrors(latestErrors);
           setShowErrorPopup(true);
         }
 
@@ -53,7 +56,7 @@ export const useErrorMonitoring = () => {
 
   return {
     showErrorPopup,
-    errorIncrease,
+    newErrors,
     closePopup,
   };
 };

@@ -1,17 +1,36 @@
 import styled from '@emotion/styled';
+import type { ApiError } from '../types/apiErrors';
 
 interface ErrorNotificationProps {
-  errorIncrease: number;
+  errors: ApiError[];
   onClose: () => void;
 }
 
-export const ErrorNotification = ({ errorIncrease, onClose }: ErrorNotificationProps) => {
+export const ErrorNotification = ({ errors, onClose }: ErrorNotificationProps) => {
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleString('ko-KR', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+    });
+  };
+
   return (
     <ErrorPopupOverlay onClick={onClose}>
       <ErrorPopup onClick={(e) => e.stopPropagation()}>
-        <PopupIcon>⚠️</PopupIcon>
-        <PopupTitle>새로운 에러 발생!</PopupTitle>
-        <PopupMessage>{errorIncrease}개의 새로운 에러가 발생했습니다</PopupMessage>
+        <PopupTitle>새로운 에러 발생! ({errors.length}개)</PopupTitle>
+        <ErrorList>
+          {errors.map((error) => (
+            <ErrorItem key={error.id}>
+              <ErrorEndpoint>{error.errorCode}</ErrorEndpoint>
+              <ErrorTime>{formatDate(error.createdAt)}</ErrorTime>
+            </ErrorItem>
+          ))}
+        </ErrorList>
       </ErrorPopup>
     </ErrorPopupOverlay>
   );
@@ -33,11 +52,13 @@ const ErrorPopupOverlay = styled.div`
 const ErrorPopup = styled.div`
   background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
   color: white;
-  padding: 32px 48px;
+  padding: 24px 32px;
   border-radius: 16px;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-  text-align: center;
-  min-width: 400px;
+  min-width: 500px;
+  max-width: 700px;
+  max-height: 80vh;
+  overflow-y: auto;
   animation: popupSlideIn 0.3s ease-out;
 
   @keyframes popupSlideIn {
@@ -52,31 +73,35 @@ const ErrorPopup = styled.div`
   }
 `;
 
-const PopupIcon = styled.div`
-  font-size: 64px;
-  margin-bottom: 16px;
-  animation: iconBounce 0.5s ease-out;
-
-  @keyframes iconBounce {
-    0%, 100% {
-      transform: translateY(0);
-    }
-    50% {
-      transform: translateY(-10px);
-    }
-  }
-`;
-
 const PopupTitle = styled.h2`
-  font-size: 28px;
+  font-size: 24px;
   font-weight: 700;
-  margin: 0 0 12px 0;
+  margin: 0 0 20px 0;
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  text-align: center;
 `;
 
-const PopupMessage = styled.p`
-  font-size: 18px;
-  font-weight: 500;
-  margin: 0;
-  opacity: 0.95;
+const ErrorList = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+`;
+
+const ErrorItem = styled.div`
+  background: rgba(255, 255, 255, 0.15);
+  padding: 16px;
+  border-radius: 8px;
+  backdrop-filter: blur(10px);
+`;
+
+const ErrorEndpoint = styled.div`
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 8px;
+  font-family: 'Consolas', 'Monaco', monospace;
+`;
+
+const ErrorTime = styled.div`
+  font-size: 14px;
+  opacity: 0.9;
 `;
