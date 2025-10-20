@@ -262,14 +262,38 @@ export const Monitoring = () => {
           {data.cancellations.failed}번
         </Content>
         <Content
-          height={"100"}
           width={"352"}
-          title="원서 PDF 다운로드 실패"
+          textColor="#000000"
+          backColor="#F7F7F7"
+          title="PDF 다운로드 성공"
+        >
+          {data.pdf.download.success}번
+        </Content>
+        <Content
+          width={"352"}
+          title="PDF 다운로드 실패"
           textColor={data.pdf.download.failed >= 1 ? "red" : "#000000"}
           backColor="#F7F7F7"
           className={data.pdf.download.failed >= 1 ? "blink" : ""}
         >
           {data.pdf.download.failed}번
+        </Content>
+        <Content
+          width={"352"}
+          textColor="#000000"
+          backColor="#F7F7F7"
+          title="PDF 미리보기 성공"
+        >
+          {data.pdf.preview.success}번
+        </Content>
+        <Content
+          width={"352"}
+          title="PDF 미리보기 실패"
+          textColor={data.pdf.preview.failed >= 1 ? "red" : "#000000"}
+          backColor="#F7F7F7"
+          className={data.pdf.preview.failed >= 1 ? "blink" : ""}
+        >
+          {data.pdf.preview.failed}번
         </Content>
         </Flex>
 
